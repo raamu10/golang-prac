@@ -40,7 +40,7 @@ func getPersonDetails() http.HandlerFunc {
 
 			var id string = r.URL.Query().Get("id")
 
-			person, todoList, err := model.GetPersonData(id)
+			person, todoList, addressData, err := model.GetPersonData(id)
 
 			if err != nil {
 				w.Write([]byte("Some error on data fetch!!"))
@@ -52,6 +52,7 @@ func getPersonDetails() http.HandlerFunc {
 				Name: person.Name,
 				Email: person.Email,
 				TodoList: todoList,
+				Address: addressData,
 			}
 
 			w.WriteHeader(http.StatusCreated)
@@ -59,9 +60,38 @@ func getPersonDetails() http.HandlerFunc {
 
 			fmt.Println("In getPerson----->")
 			fmt.Println("person->", person)
-			fmt.Println("todoList->", todoList)
-			fmt.Println("person->", resp)
+			//fmt.Println("todoList->", todoList)
+			//fmt.Println("person->", resp)
 			
+		}
+	}
+}
+
+func getAddressByPerson() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if (r.Method == http.MethodGet) {
+			fmt.Println(r.URL.Query().Get("id"))
+			var id string = r.URL.Query().Get("id")
+
+			addressData, err := model.GetAddressByPersonId(id)
+
+			if err != nil {
+				w.Write([]byte("Some error on address data fetch!!"))
+				return
+			}
+
+			resp := views.Address{
+				ID: addressData.ID,
+				PersonId: addressData.PersonId,
+				Street: addressData.Street,
+				City: addressData.City,
+				State: addressData.State,
+				Country: addressData.Country,
+				Zipcode: addressData.Zipcode,
+			}
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(resp)
 		}
 	}
 }

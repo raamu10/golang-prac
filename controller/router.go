@@ -19,6 +19,7 @@ func Register() *http.ServeMux {
 	//Person with Multi TODO
 	mux.HandleFunc("/addPersonTodo", addPersonTodo())
 	mux.HandleFunc("/person/", getPersonDetails())
+	mux.HandleFunc("/getAddress/", getAddressByPerson())
 
 
 	return mux
