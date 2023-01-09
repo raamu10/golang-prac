@@ -213,3 +213,48 @@ func GetAddressByPersonId(id string) (views.Address, error) {
 	return addressData, nil
 
 }
+
+func UpdateAddressByPerson(id string, address views.Address) error {
+	
+	collectionAddress := connectDB.Collection(COL_ADDRESS)
+
+
+	// convert id string to ObjectId
+	personId, err := primitive.ObjectIDFromHex(id)
+	if err != nil{
+		log.Println("Invalid id")
+	}
+
+	//Update Address with personId
+	filter := bson.D{
+		{"personId", personId},
+	}
+
+	update := bson.D{
+		{ "$set" , bson.D{
+			{"street", address.Street},
+			{"city", address.City},
+			{"state", address.State},
+			{"country", address.Country},
+			{"zipcode", address.Zipcode},
+		},
+		},
+	}
+
+	//row, err := collectionAddress.UpdateOne(context.TODO(), filter, update)
+	result := collectionAddress.FindOneAndUpdate(context.TODO(), filter, update)
+
+	if result.Err() != nil {
+		return result.Err()
+	}
+
+	// 9) Decode the result
+	doc := bson.M{}
+	decodeErr := result.Decode(&doc)
+
+	fmt.Println("update resp ->,", doc)
+	fmt.Println("decodeErr resp ->,", decodeErr)
+
+	return nil
+
+}

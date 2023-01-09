@@ -15,11 +15,12 @@ func addPersonTodo() http.HandlerFunc {
 		if (r.Method == http.MethodPost) {
 			//fmt.Println("R.body", r.Body)
 			data := views.PersonInput {}
+			//Decode the josn data from post
 			json.NewDecoder(r.Body).Decode(&data)
 			//fmt.Println("data1", data)
 
 			if err := model.AddTodoList(data); err != nil {
-				w.Write([]byte("Some error!!"))
+				w.Write([]byte("Some error in add person!!"))
 				return
 			}
 
@@ -92,6 +93,33 @@ func getAddressByPerson() http.HandlerFunc {
 
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(resp)
+		}
+	}
+}
+
+func updateAddressByPerson() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if (r.Method == http.MethodPut) {
+			data := views.Address{}
+			//Decode body params
+			fmt.Println("update->",r.URL.Query().Get("id"))
+			var id string = r.URL.Query().Get("id")
+			json.NewDecoder(r.Body).Decode(&data)
+
+			fmt.Println("data->", data)
+
+			err := model.UpdateAddressByPerson(id, data)
+
+			if err != nil {
+				w.Write([]byte("Some error in Address update!!"))
+				return
+			}
+			//fmt.Println("resp->", resp)
+
+			w.WriteHeader(http.StatusOK)
+
+			//Custom json response
+			json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 		}
 	}
 }
